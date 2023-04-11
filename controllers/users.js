@@ -22,8 +22,43 @@ const createUser = (req, res) => {
     .catch(() => res.status(500).send({ message: 'Ошибка в создании пользователя' }));
 };
 
+const setUserInfo = (req, res) => {
+  const { _id } = req.user;
+  // console.log(_id);
+  const { name, about } = req.body;
+
+  User.findByIdAndUpdate(
+    _id,
+    { name, about },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
+    .then((user) => res.send({ data: user }))
+    .catch(() => res.status(500).send({ message: 'Данные не прошли валидацию' }));
+};
+
+const setAvatar = (req, res) => {
+  const { _id } = req.user;
+  const { avatar } = req.body;
+
+  User.findByIdAndUpdate(
+    _id,
+    { avatar },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
+    .then((user) => res.send(user))
+    .catch(() => res.status(500).send({ message: 'Данные не прошли валидацию' }));
+};
+
 module.exports = {
   getUsers,
   getUser,
   createUser,
+  setUserInfo,
+  setAvatar,
 };

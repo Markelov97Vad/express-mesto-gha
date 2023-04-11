@@ -9,7 +9,7 @@ const getCards = (req, res) => {
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
   const owner = req.user._id;
   console.log(`получил айди ${owner}`);
   console.log({ name, link, owner });
@@ -27,10 +27,35 @@ const deleteCard = (req, res) => {
     .catch(() => res.status(500).send({ message: 'Произошла ошибка при удалении' }));
 };
 
+const likeCard = (req, res) => {
+  const { cardId } = req.params;
+  const { _id } = req.user;
+  Card.findByIdAndUpdate(
+    cardId,
+    { $addToSet: { likes: _id } }, // добавить _id в массив, если его там нет
+    { new: true },
+  )
+    .then((data) => res.send(data))
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка при добавлении лайка' }));
+};
+
+const dislikeCard = (req, res) => {
+  const { cardId } = req.params;
+  const { _id } = req.user;
+  Card.findByIdAndUpdate(
+    cardId,
+    { $pull: { likes: _id } }, // убрать _id из массива
+    { new: true },
+  )
+    .then((data) => res.send(data))
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка при добавлении лайка' }));
+};
 // console.log(createCard2);
 
 module.exports = {
   getCards,
   createCard,
   deleteCard,
+  likeCard,
+  dislikeCard,
 };
