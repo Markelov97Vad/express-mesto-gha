@@ -7,56 +7,41 @@ const {
   SERVER_ERROR_CODE,
 } = require('../utils/codeStatus');
 
-//!
 const getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(200).send(users))
+    .then((users) => res.status(OK_CODE).send(users))
     .catch((err) => res.status(SERVER_ERROR_CODE).send(err));
-    // .catch((err) => {
-    //   if (err.name === 'ValidationError') {
-    //     res.status(BAD_REQUEST_CODE).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-    //   } else {
-    //     res.status(SERVER_ERROR_CODE).send(err);
-    //   }
-    // });
 };
-// !
+
 const getUserById = (req, res) => {
   const { userId } = req.params;
-  // console.log(userId);
   User.findById(userId)
     .then((user) => res.status(OK_CODE).send(user))
     .catch((err) => {
-      // console.log(err.message);
       if (err.name === 'CastError') {
-        res.status(NOT_FOUND_CODE).send({ message: 'Передан несуществующий _id карточки.' });
+        res.status(NOT_FOUND_CODE).send({ message: `Передан несуществующий id: ${userId} карточки.` });
       } else {
         res.status(SERVER_ERROR_CODE).send(err);
       }
     });
 };
-// !
+
 const createUser = (req, res) => {
-  // console.log(req.body);
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
     .then((user) => res.status(OK_CODE).send(user))
     .catch((err) => {
-      // console.log(err.message);
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST_CODE).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-        // res.send(err);
       } else {
         res.status(SERVER_ERROR_CODE).send(err);
       }
     });
 };
-//!
+
 const setUserInfo = (req, res) => {
   const { _id } = req.user;
-  // const _id = '64353ad1adf0d5240cb67f8a';
-  // console.log(_id);
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
@@ -83,9 +68,8 @@ const setUserInfo = (req, res) => {
       }
     });
 };
-//!
+
 const setAvatar = (req, res) => {
-  // const { _id } = req.user;
   const _id = '64353ad1adf0d5240cb67f8a';
   const { avatar } = req.body;
 

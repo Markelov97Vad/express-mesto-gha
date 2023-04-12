@@ -6,19 +6,16 @@ const {
   NOT_FOUND_CODE,
   SERVER_ERROR_CODE,
 } = require('../utils/codeStatus');
-//!
+
 const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.status(OK_CODE).send(cards))
     .catch((err) => res.status(SERVER_ERROR_CODE).send(err));
 };
-// !
+
 const createCard = (req, res) => {
   const { name, link } = req.body;
-  // console.log(req.body);
   const owner = req.user._id;
-  console.log(`получил айди ${owner}`);
-  console.log({ name, link, owner });
 
   Card.create({ name, link, owner })
     .then((card) => res.send(card))
@@ -30,9 +27,8 @@ const createCard = (req, res) => {
       }
     });
 };
-// !
+
 const deleteCard = (req, res) => {
-  console.log(req.params);
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
     .then((card) => {
@@ -49,9 +45,9 @@ const deleteCard = (req, res) => {
 };
 
 const likeCard = (req, res) => {
-  const { cardId } = req.params; // 64353ad1adf0d5240cb67f8b
-  const { _id } = req.user; //       64353ad1adf0d5240cb67f8b
-  // const _id = '64353ad1adf0d5240cb67f8a';
+  const { cardId } = req.params;
+  const { _id } = req.user;
+
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: _id } }, // добавить _id в массив, если его там нет
