@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const router = require('./routes');
 const bodyParser = require('body-parser');
+const router = require('./routes');
 
 // id: 64353ad1adf0d5240cb67f8b
 
@@ -20,7 +20,6 @@ app.use((req, res, next) => {
   req.user = {
     _id: '64353ad1adf0d5240cb67f8b',
   };
-  // console.log(req.user);
   next();
 });
 app.use(router);
@@ -28,7 +27,3 @@ app.use(router);
 app.listen(PORT, () => {
   console.log(`Сервер запущен ${PORT}`);
 });
-
-// module.exports.createCard2 = ((req, res) => {
-//   console.log(req.user._id);
-// });
