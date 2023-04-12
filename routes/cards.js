@@ -13,9 +13,9 @@ cardsRouter.get('/', getCards);
 cardsRouter.post('/', createCard);
 // удаляет карточку
 cardsRouter.delete('/:cardId', deleteCard);
-// поставить лайк карточке
+// ставит лайк карточке
 cardsRouter.put('/:cardId/likes', likeCard);
-// убрать лайк с карточки
+// убирает лайк с карточки
 cardsRouter.delete('/:cardId/likes', dislikeCard);
 
 module.exports = cardsRouter;

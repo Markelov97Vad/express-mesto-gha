@@ -28,19 +28,24 @@ const createCard = (req, res) => {
       }
     });
 };
-
+// 381 str
+// "id": "643713381833c922d23d00e9"
+// "owner": "6437132212ee46a2548a8abd"
+// delete id card : "643713381833c922d23d00e9"
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
-    .then((card) => {
-      if (!card) {
+    .then((deletedCard) => {
+      if (!deletedCard) {
         return Promise.reject(new ValidationIdError('Invalid id'));
       }
-      return res.starus(OK_CODE).send(card);
+      return res.starus(OK_CODE).send(deletedCard);
     })
     .catch((err) => {
       if (err.name === 'ValidationIdError') {
         res.status(NOT_FOUND_CODE).send({ message: `Карточка с указанным id: ${cardId} не найдена.` });
+      } else {
+        res.status(SERVER_ERROR_CODE).send(err);
       }
     });
 };
