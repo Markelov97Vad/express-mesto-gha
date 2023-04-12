@@ -34,16 +34,17 @@ const createCard = (req, res) => {
 // delete id card : "643713381833c922d23d00e9"
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
-  Card.findByIdAndRemove(cardId)
+  Card.findByIdAndDelete(cardId)
     .then((deletedCard) => {
       if (!deletedCard) {
         return Promise.reject(new ValidationIdError('Invalid id'));
-      }
-      return res.starus(OK_CODE).send(deletedCard);
+      } return res.status(OK_CODE).send({ message: `Карточка с id: ${cardId} была удалена` });
     })
     .catch((err) => {
       if (err.name === 'ValidationIdError') {
         res.status(NOT_FOUND_CODE).send({ message: `Карточка с указанным id: ${cardId} не найдена.` });
+      } else if (err.name === 'CastError') {
+        res.status(BAD_REQUEST_CODE).send({ message: `Указан некорректный id: ${cardId}` });
       } else {
         res.status(SERVER_ERROR_CODE).send(err);
       }
