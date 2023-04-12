@@ -16,12 +16,21 @@ const getUsers = (req, res) => {
 const getUserById = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
-    .then((user) => res.status(OK_CODE).send(user))
+    .then((user) => {
+      if (!user) {
+        // return Promise.reject(new ValidationIdError('Invalid id'));
+        throw new ValidationIdError('Invalid id');
+      }
+      return res.status(OK_CODE).send(user);
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(NOT_FOUND_CODE).send({ message: `Передан несуществующий id: ${userId} карточки.` });
+        res.status(BAD_REQUEST_CODE).send({ message: `Передан некорретный Id: ${userId} карточки.` });
+      } else if (err.name === 'ValidationIdError') {
+        res.status(NOT_FOUND_CODE).send({ message: `Пользователь по указанному Id: ${userId} не найден.` });
       } else {
         res.status(SERVER_ERROR_CODE).send(err);
+        // res.send(err);
       }
     });
 };
