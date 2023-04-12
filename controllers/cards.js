@@ -1,3 +1,4 @@
+// const card = require('../models/card');
 const Card = require('../models/card');
 const ValidationIdError = require('../utils/ValidationIdError');
 const {
@@ -53,14 +54,20 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: _id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
-    .then((data) => res.status(OK_CODE).send(data))
+    .then((card) => {
+      if (!card) {
+        return Promise.reject(new ValidationIdError('Invalid id'));
+      }
+      return res.status(OK_CODE).send(card);
+    })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST_CODE).send({ message: 'Переданы некорректные данные для постановки лайка' });
-      } else if (err.name === 'CastError') {
+      if (err.name === 'ValidationIdError') {
         res.status(NOT_FOUND_CODE).send({ message: `Передан несуществующий id: ${cardId} карточки.` });
+      } else if (err.name === 'CastError') {
+        res.status(BAD_REQUEST_CODE).send({ message: 'Переданы некорректные данные для постановки лайка' });
       } else {
         res.status(SERVER_ERROR_CODE).send(err);
+        // res.send(err);
       }
     });
 };
@@ -74,12 +81,15 @@ const dislikeCard = (req, res) => {
     { new: true },
   )
     .then((card) => {
-      res.starus(OK_CODE).send(card);
+      if (!card) {
+        return Promise.reject(new ValidationIdError('Invalid id'));
+      }
+      return res.status(OK_CODE).send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST_CODE).send({ message: 'Переданы некорректные данные для постановки лайка' });
-      } else if (err.name === 'CastError') {
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST_CODE).send({ message: 'Переданы некорректные данные для снятии лайка' });
+      } else if (err.name === 'ValidationIdError') {
         res.status(NOT_FOUND_CODE).send({ message: `Передан несуществующий id: ${cardId} карточки.` });
       } else {
         res.status(SERVER_ERROR_CODE).send(err);

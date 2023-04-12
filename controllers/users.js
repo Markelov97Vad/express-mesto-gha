@@ -79,7 +79,8 @@ const setUserInfo = (req, res) => {
 };
 
 const setAvatar = (req, res) => {
-  const _id = '64353ad1adf0d5240cb67f8a';
+  // const _id = '64353ad1adf0d5240cb67f8a';
+  const { _id } = req.user;
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(
