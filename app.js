@@ -2,11 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const router = require('./routes');
-const { PORT, DATABASE_URL } = require('./utils/config');
+const { PORT } = require('./utils/config');
 
 const app = express();
 
-mongoose.connect(DATABASE_URL, {
+mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
 
