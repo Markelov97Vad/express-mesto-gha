@@ -7,19 +7,21 @@ const {
   SERVER_ERROR_CODE,
 } = require('../utils/codeStatus');
 
+// запрос всех пользователей
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(OK_CODE).send(users))
-    .catch((err) => res.status(SERVER_ERROR_CODE).send(err));
+    .catch(() => res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' }));
 };
 
+// запрос пользователя по ID
 const getUserById = (req, res) => {
   const { userId } = req.params;
+
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        // return Promise.reject(new ValidationIdError('Invalid id'));
-        throw new ValidationIdError('Invalid id');
+        return Promise.reject(new ValidationIdError('Invalid id'));
       }
       return res.status(OK_CODE).send(user);
     })
@@ -29,12 +31,12 @@ const getUserById = (req, res) => {
       } else if (err.name === 'ValidationIdError') {
         res.status(NOT_FOUND_CODE).send({ message: `Пользователь по указанному Id: ${userId} не найден.` });
       } else {
-        res.status(SERVER_ERROR_CODE).send(err);
-        // res.send(err);
+        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
 
+// отправка данных о новом пользователе
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
@@ -44,11 +46,12 @@ const createUser = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST_CODE).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       } else {
-        res.status(SERVER_ERROR_CODE).send(err);
+        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
 
+// обновление данных пользователя
 const setUserInfo = (req, res) => {
   const { _id } = req.user;
   const { name, about } = req.body;
@@ -73,13 +76,13 @@ const setUserInfo = (req, res) => {
       } else if (err.name === 'ValidationIdError') {
         res.status(NOT_FOUND_CODE).send({ message: `Пользователь с указанным id: ${_id} не найден.` });
       } else {
-        res.status(SERVER_ERROR_CODE).send(err);
+        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
 
+// обновление аватара пользователя
 const setAvatar = (req, res) => {
-  // const _id = '64353ad1adf0d5240cb67f8a';
   const { _id } = req.user;
   const { avatar } = req.body;
 
@@ -103,7 +106,7 @@ const setAvatar = (req, res) => {
       } else if (err.name === 'ValidationIdError') {
         res.status(NOT_FOUND_CODE).send({ message: `Пользователь с указанным id: ${_id} не найден.` });
       } else {
-        res.status(SERVER_ERROR_CODE).send(err);
+        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
