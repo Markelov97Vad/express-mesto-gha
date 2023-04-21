@@ -1,8 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+
 const router = require('./routes');
 const { PORT } = require('./utils/config');
+const { login, createUser } = require('./controllers/users');
 
 const app = express();
 
@@ -20,6 +22,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.post('/signin', login);
+app.post('/signup', createUser);
 app.use(router);
 
 app.listen(PORT, () => {

@@ -12,7 +12,7 @@ usersRouter.get('/', getUsers);
 // возвращает пользователя по _id
 usersRouter.get('/:userId', getUserById);
 // создаёт пользователя
-usersRouter.post('/', createUser);
+// usersRouter.post('/', createUser);
 // обновляет профиль
 usersRouter.patch('/me', setUserInfo);
 // обновляет аватар

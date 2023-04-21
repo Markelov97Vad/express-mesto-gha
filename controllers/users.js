@@ -1,3 +1,6 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
 const User = require('../models/user');
 const ValidationIdError = require('../utils/ValidationIdError');
 const {
@@ -6,6 +9,17 @@ const {
   NOT_FOUND_CODE,
   SERVER_ERROR_CODE,
 } = require('../utils/codeStatus');
+
+const login = (req, res) => {
+  const { email, password } = req.body;
+  User.findUserByCredentails(email, password)
+    .then((user) => {
+      // создаем токен
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch((err) => res.status(401).send({ message: err.message }));
+};
 
 // запрос всех пользователей
 const getUsers = (req, res) => {
@@ -38,9 +52,22 @@ const getUserById = (req, res) => {
 
 // отправка данных о новом пользователе
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-
-  User.create({ name, about, avatar })
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
+  // Хеширование пароля
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
     .then((user) => res.status(OK_CODE).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -112,6 +139,7 @@ const setAvatar = (req, res) => {
 };
 
 module.exports = {
+  login,
   getUsers,
   getUserById,
   createUser,
