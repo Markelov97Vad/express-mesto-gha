@@ -34,11 +34,40 @@ const createCard = (req, res) => {
 // запрос на удаление карточки
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
-  Card.findByIdAndDelete(cardId)
+  const { _id } = req.user;
+  // if (_id !== cardId) {
+  //   throw new Error('попытка удалить чужую карточку');
+  // }
+  Card.findById(cardId)
+    .then((card) => {
+      if (!card) {
+        return Promise.reject(new Error(`Карточка с указанным id: ${cardId} не найдена.`));
+      }
+      if (card.owner.toString() !== _id) {
+        console.log(card.owner.toString());
+        console.log(_id);
+        return Promise.reject(new Error('попытка удалить чужую карточку'));
+      }
+      Card.findByIdAndDelete(cardId)
+        .then((deletedCard) => {
+          console.log('deleteCard: ', deletedCard);
+          return res.status(OK_CODE).send({ message: `Карточка с id: ${cardId} была удалена` });
+        })
+        .catch((err) => res.status(403).send({ message: err.message }));
+    })
+    .catch((err) => res.status(403).send({ message: err.message }));
+ /* Card.findByIdAndDelete(cardId)
     .then((deletedCard) => {
+      // if (_id !== cardId) {
+      //   return Promise.reject(new Error('попытка удалить чужую карточку'));
+      // }
       if (!deletedCard) {
         return Promise.reject(new ValidationIdError('Invalid id'));
-      } return res.status(OK_CODE).send({ message: `Карточка с id: ${cardId} была удалена` });
+      } else if (_id !== cardId) {
+        return Promise.reject(new Error('попытка удалить чужую карточку'));
+      }
+      console.log('deleteCard: ', deleteCard);
+      return res.status(OK_CODE).send({ message: `Карточка с id: ${cardId} была удалена` });
     })
     .catch((err) => {
       if (err.name === 'ValidationIdError') {
@@ -46,9 +75,11 @@ const deleteCard = (req, res) => {
       } else if (err.name === 'CastError') {
         res.status(BAD_REQUEST_CODE).send({ message: `Указан некорректный id: ${cardId}` });
       } else {
-        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
+        res.status(403).send({ message: err.message });
+        // res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
       }
-    });
+      // res.status(403).send({ message: err.message });
+    }); */
 };
 
 // запрос на добавление пользователя в объект likes выбранной карточки
