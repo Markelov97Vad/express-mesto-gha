@@ -50,6 +50,20 @@ const getUserById = (req, res) => {
     });
 };
 
+const getCurrentUser = (req, res) => {
+  const { _id } = req.user;
+  User.findById(_id)
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error('Пользователь не найден'));
+      }
+      return res.status(200).send(user);
+    })
+    .catch((err) => {
+      res.status(404).send({ message: err.message });
+    });
+};
+
 // отправка данных о новом пользователе
 const createUser = (req, res) => {
   const {
@@ -142,6 +156,7 @@ module.exports = {
   login,
   getUsers,
   getUserById,
+  getCurrentUser,
   createUser,
   setUserInfo,
   setAvatar,
