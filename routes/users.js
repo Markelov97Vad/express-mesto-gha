@@ -11,8 +11,9 @@ const {
 usersRouter.get('/', getUsers);
 // возвращает пользователя по _id
 usersRouter.get('/:userId', getUserById);
-// создаёт пользователя
+// свозвращает информацию о текущем пользователе
 // usersRouter.post('/', createUser);
+usersRouter.get('/me', '');
 // обновляет профиль
 usersRouter.patch('/me', setUserInfo);
 // обновляет аватар
