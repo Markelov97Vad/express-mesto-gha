@@ -92,7 +92,7 @@ const deleteCard = (req, res, next) => {
 };
 
 // запрос на добавление пользователя в объект likes выбранной карточки
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   const { cardId } = req.params;
   const { _id } = req.user;
 
@@ -103,23 +103,20 @@ const likeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        return Promise.reject(new ValidationIdError('Invalid id'));
+        throw new NotFoundError(`Передан несуществующий id: ${cardId} карточки.`);
       }
       return res.status(OK_CODE).send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationIdError') {
-        res.status(NOT_FOUND_CODE).send({ message: `Передан несуществующий id: ${cardId} карточки.` });
-      } else if (err.name === 'CastError') {
-        res.status(BAD_REQUEST_CODE).send({ message: 'Переданы некорректные данные для постановки лайка' });
-      } else {
-        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
+      if (err.name === 'CastError') {
+        return next(new BadRequestError('Переданы некорректные данные для постановки лайка'));
       }
+      return next(err);
     });
 };
 
 // запрос на удаление пользователя из объекта likes выбранной карточки
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   const { cardId } = req.params;
   const { _id } = req.user;
   Card.findByIdAndUpdate(
@@ -129,18 +126,15 @@ const dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        return Promise.reject(new ValidationIdError('Invalid id'));
+        throw new NotFoundError(`Передан несуществующий id: ${cardId} карточки.`);
       }
       return res.status(OK_CODE).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST_CODE).send({ message: 'Переданы некорректные данные для снятии лайка' });
-      } else if (err.name === 'ValidationIdError') {
-        res.status(NOT_FOUND_CODE).send({ message: `Передан несуществующий id: ${cardId} карточки.` });
-      } else {
-        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
+        return next(new BadRequestError('Переданы некорректные данные для снятии лайка'));
       }
+      return next(err);
     });
 };
 
