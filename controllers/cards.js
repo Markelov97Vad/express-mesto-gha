@@ -1,5 +1,9 @@
+const ForbiddenError = require('../errors/ForbiddenError');
+const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/badRequestError');
 const Card = require('../models/card');
 const ValidationIdError = require('../utils/ValidationIdError');
+
 const {
   OK_CODE,
   BAD_REQUEST_CODE,
@@ -8,14 +12,14 @@ const {
 } = require('../utils/codeStatus');
 
 // запрос всех карточек
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(OK_CODE).send(cards))
-    .catch(() => res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' }));
+    .catch((next));
 };
 
 // отправка данных о новой карточке
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   console.log(req.body);
   const owner = req.user._id;
@@ -24,15 +28,14 @@ const createCard = (req, res) => {
     .then((card) => res.status(OK_CODE).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST_CODE).send({ message: 'Переданы некорректные данные при создании карточки.' });
-      } else {
-        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
+        return next(new BadRequestError('Переданы некорректные данные при создании карточки.'));
       }
+      return next(err);
     });
 };
 
 // запрос на удаление карточки
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   const { _id } = req.user;
   // if (_id !== cardId) {
@@ -41,21 +44,27 @@ const deleteCard = (req, res) => {
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        return Promise.reject(new Error(`Карточка с указанным id: ${cardId} не найдена.`));
+        throw new NotFoundError(`Карточка с указанным id: ${cardId} не найдена.`);
       }
       if (card.owner.toString() !== _id) {
         console.log(card.owner.toString());
         console.log(_id);
-        return Promise.reject(new Error('попытка удалить чужую карточку'));
+        throw new ForbiddenError('попытка удалить чужую карточку');
       }
       Card.findByIdAndDelete(cardId)
         .then((deletedCard) => {
           console.log('deleteCard: ', deletedCard);
           return res.status(OK_CODE).send({ message: `Карточка с id: ${cardId} была удалена` });
         })
-        .catch((err) => res.status(403).send({ message: err.message }));
+        .catch(next);
     })
-    .catch((err) => res.status(403).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return next(new BadRequestError(`Указан некорректный id: ${cardId}`));
+      }
+      // return res.send(err);
+      return next(err);
+    });
  /* Card.findByIdAndDelete(cardId)
     .then((deletedCard) => {
       // if (_id !== cardId) {

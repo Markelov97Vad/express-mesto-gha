@@ -6,6 +6,7 @@ const router = require('./routes');
 const { PORT } = require('./utils/config');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const { SERVER_ERROR_CODE } = require('./utils/codeStatus');
 
 const app = express();
 
@@ -29,6 +30,18 @@ app.post('/signin', login);
 app.use(auth);
 // роуты требующие авторизацию
 app.use(router);
+
+// централизированная обработка ошибок
+app.use((err, req, res, next) => {
+  const { statusCode = SERVER_ERROR_CODE, message } = err;
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === SERVER_ERROR_CODE
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
+});
 
 app.listen(PORT, () => {
   console.log(`Сервер запущен ${PORT}`);
