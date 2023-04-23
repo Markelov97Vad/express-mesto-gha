@@ -38,8 +38,8 @@ const deleteCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError(`Карточка с указанным id: ${cardId} не найдена.`);
       }
-      if (card.owner.toString() !== _id) {
-        throw new ForbiddenError('попытка удалить чужую карточку');
+      if (card.owner.valueOf() !== _id) {
+        throw new ForbiddenError('Попытка удалить чужую карточку');
       }
       Card.findByIdAndDelete(cardId)
         .then(() => res.status(OK_CODE).send({ message: `Карточка с id: ${cardId} была удалена` }))
