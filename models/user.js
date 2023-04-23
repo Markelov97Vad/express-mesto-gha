@@ -34,7 +34,6 @@ const userSchema = new mongoose.Schema({
     unique: true,
     validate: {
       validator(value) {
-        console.log('fff');
         return validator.isEmail(value);
       },
       message: 'Некорректный email',
@@ -51,22 +50,14 @@ userSchema.statics.findUserByCredentails = function (email, password) {
   return this.findOne({ email }).select('+password') // добавить хэш
     .then((user) => {
       if (!user) {
-        console.log(user);
         throw new UnauthorizedError('Неправильные почта или пароль');
-        // throw new Error('ffgfg');
-        // return Promise.reject(new Error('Новая ошибка'));
       }
       // если нашли - сравниваем хеш
-      console.log(user.password);
-      console.log(password);
-      console.log(bcrypt.compare(password, user.password));
       return bcrypt.compare(password, user.password)
         .then((matched) => {
-          console.log('matched: ', matched);
           if (!matched) {
             throw new UnauthorizedError('Неправильные почта или пароль');
           }
-          console.log('User: ', user);
           // если все успешно возвращаем токен
           return user;
         });

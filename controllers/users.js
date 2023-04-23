@@ -2,12 +2,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
-// const ValidationIdError = require('../utils/ValidationIdError');
 const {
   OK_CODE,
-  // BAD_REQUEST_CODE,
-  // NOT_FOUND_CODE,
-  // SERVER_ERROR_CODE,
 } = require('../utils/codeStatus');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
@@ -75,7 +71,6 @@ const createUser = (req, res, next) => {
   User.findOne({ email })
     .then((data) => {
       if (data) {
-        console.log('Такой пользователь есть', data.email);
         throw new ConflictError(`При регистрации указан ${email}, который уже существует на сервере`);
       } // Хеширование пароля
       return bcrypt.hash(password, 10)
@@ -86,10 +81,7 @@ const createUser = (req, res, next) => {
           email,
           password: hash,
         }))
-        .then((user) => {
-          console.log(user);
-          return res.status(OK_CODE).send(user);
-        })
+        .then((user) => res.status(OK_CODE).send(user))
         .catch((err) => {
           if (err.name === 'ValidationError') {
             return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
@@ -98,23 +90,6 @@ const createUser = (req, res, next) => {
         });
     })
     .catch(next);
-
-  // Хеширование пароля
-  // bcrypt.hash(password, 10)
-  //   .then((hash) => User.create({
-  //     name,
-  //     about,
-  //     avatar,
-  //     email,
-  //     password: hash,
-  //   }))
-  //   .then((user) => res.status(OK_CODE).send(user))
-  //   .catch((err) => {
-  //     if (err.name === 'ValidationError') {
-  //    return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
-  //     }
-  //     return next(err);
-  //   });
 };
 
 // обновление данных пользователя

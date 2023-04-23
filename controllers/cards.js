@@ -2,13 +2,9 @@ const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 const Card = require('../models/card');
-// const ValidationIdError = require('../utils/ValidationIdError');
 
 const {
   OK_CODE,
-  // BAD_REQUEST_CODE,
-  // NOT_FOUND_CODE,
-  // SERVER_ERROR_CODE,
 } = require('../utils/codeStatus');
 
 // запрос всех карточек
@@ -21,7 +17,6 @@ const getCards = (req, res, next) => {
 // отправка данных о новой карточке
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
-  console.log(req.body);
   const owner = req.user._id;
 
   Card.create({ name, link, owner })
@@ -44,15 +39,10 @@ const deleteCard = (req, res, next) => {
         throw new NotFoundError(`Карточка с указанным id: ${cardId} не найдена.`);
       }
       if (card.owner.toString() !== _id) {
-        console.log(card.owner.toString());
-        console.log(_id);
         throw new ForbiddenError('попытка удалить чужую карточку');
       }
       Card.findByIdAndDelete(cardId)
-        .then((deletedCard) => {
-          console.log('deleteCard: ', deletedCard);
-          return res.status(OK_CODE).send({ message: `Карточка с id: ${cardId} была удалена` });
-        })
+        .then(() => res.status(OK_CODE).send({ message: `Карточка с id: ${cardId} была удалена` }))
         .catch(next);
     })
     .catch((err) => {

@@ -19,12 +19,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: '64353ad1adf0d5240cb67f8b',
-//   };
-//   next();
-// });
 // регистрация и аутентификация
 app.post('/signup', registrationValidation, createUser);
 app.post('/signin', loginValidation, login);

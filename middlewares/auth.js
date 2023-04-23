@@ -10,7 +10,6 @@ module.exports = (req, res, next) => {
   // извлечение токена
   const token = authorization.replace('Bearer', '');
   // верификация токена(расшифровка)
-  // const payload = jwt.verify(token, 'some-secret-key');
   let payload;
 
   try {
@@ -21,7 +20,5 @@ module.exports = (req, res, next) => {
   }
   // записываем пейлоуд в объект запроса
   req.user = payload;
-  console.log('token: ', token);
-  console.log('payload: ', payload);
   return next();
 };
