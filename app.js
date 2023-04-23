@@ -6,7 +6,7 @@ const router = require('./routes');
 const { PORT } = require('./utils/config');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
-const { SERVER_ERROR_CODE } = require('./utils/codeStatus');
+const { errorHendler } = require('./middlewares/errorHendler');
 
 const app = express();
 
@@ -32,16 +32,7 @@ app.use(auth);
 app.use(router);
 
 // централизированная обработка ошибок
-app.use((err, req, res, next) => {
-  const { statusCode = SERVER_ERROR_CODE, message } = err;
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === SERVER_ERROR_CODE
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
-});
+app.use(errorHendler);
 
 app.listen(PORT, () => {
   console.log(`Сервер запущен ${PORT}`);

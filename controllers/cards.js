@@ -1,14 +1,14 @@
 const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
-const BadRequestError = require('../errors/badRequestError');
+const BadRequestError = require('../errors/BadRequestError');
 const Card = require('../models/card');
-const ValidationIdError = require('../utils/ValidationIdError');
+// const ValidationIdError = require('../utils/ValidationIdError');
 
 const {
   OK_CODE,
-  BAD_REQUEST_CODE,
-  NOT_FOUND_CODE,
-  SERVER_ERROR_CODE,
+  // BAD_REQUEST_CODE,
+  // NOT_FOUND_CODE,
+  // SERVER_ERROR_CODE,
 } = require('../utils/codeStatus');
 
 // запрос всех карточек
@@ -38,9 +38,6 @@ const createCard = (req, res, next) => {
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   const { _id } = req.user;
-  // if (_id !== cardId) {
-  //   throw new Error('попытка удалить чужую карточку');
-  // }
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
@@ -62,33 +59,8 @@ const deleteCard = (req, res, next) => {
       if (err.name === 'CastError') {
         return next(new BadRequestError(`Указан некорректный id: ${cardId}`));
       }
-      // return res.send(err);
       return next(err);
     });
- /* Card.findByIdAndDelete(cardId)
-    .then((deletedCard) => {
-      // if (_id !== cardId) {
-      //   return Promise.reject(new Error('попытка удалить чужую карточку'));
-      // }
-      if (!deletedCard) {
-        return Promise.reject(new ValidationIdError('Invalid id'));
-      } else if (_id !== cardId) {
-        return Promise.reject(new Error('попытка удалить чужую карточку'));
-      }
-      console.log('deleteCard: ', deleteCard);
-      return res.status(OK_CODE).send({ message: `Карточка с id: ${cardId} была удалена` });
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationIdError') {
-        res.status(NOT_FOUND_CODE).send({ message: `Карточка с указанным id: ${cardId} не найдена.` });
-      } else if (err.name === 'CastError') {
-        res.status(BAD_REQUEST_CODE).send({ message: `Указан некорректный id: ${cardId}` });
-      } else {
-        res.status(403).send({ message: err.message });
-        // res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-      }
-      // res.status(403).send({ message: err.message });
-    }); */
 };
 
 // запрос на добавление пользователя в объект likes выбранной карточки
