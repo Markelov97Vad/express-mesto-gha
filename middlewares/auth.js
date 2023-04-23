@@ -4,7 +4,7 @@ const UnauthorizedError = require('../errors/UnauthorizedError');
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
-  if (!authorization || authorization.startsWith('Bearer ')) {
+  if (!authorization || !authorization.startsWith('Bearer ')) {
     throw new UnauthorizedError('Необхадима авторизация');
   }
   // извлечение токена
