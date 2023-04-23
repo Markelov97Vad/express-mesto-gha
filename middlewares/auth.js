@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
     throw new UnauthorizedError('Необхадима авторизация');
   }
   // извлечение токена
-  const token = authorization.replace('Bearer', '');
+  const token = authorization.replace('Bearer ', '');
   // верификация токена(расшифровка)
   let payload;
 
