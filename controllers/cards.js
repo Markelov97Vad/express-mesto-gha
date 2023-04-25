@@ -10,8 +10,11 @@ const {
 // запрос всех карточек
 const getCards = (req, res, next) => {
   Card.find({})
-    .then((cards) => res.status(OK_CODE).send(cards))
-    .catch((next));
+    .populate(['owner', 'likes'])
+    .then((cards) => {
+      res.status(OK_CODE).send(cards);
+    })
+    .catch(next);
 };
 
 // отправка данных о новой карточке

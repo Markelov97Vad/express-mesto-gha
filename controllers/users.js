@@ -68,33 +68,29 @@ const createUser = (req, res, next) => {
     password,
   } = req.body;
 
-  User.findOne({ email })
-    .then((data) => {
-      if (data) {
-        throw new ConflictError(`При регистрации указан ${email}, который уже существует на сервере`);
-      } // Хеширование пароля
-      return bcrypt.hash(password, 10)
-        .then((hash) => User.create({
-          name,
-          about,
-          avatar,
-          email,
-          password: hash,
-        }))
-        .then((user) => res.status(OK_CODE).send({
-          name: user.name,
-          about: user.about,
-          avatar: user.avatar,
-          email: user.email,
-        }))
-        .catch((err) => {
-          if (err.name === 'ValidationError') {
-            return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
-          }
-          return next(err);
-        });
-    })
-    .catch(next);
+  return bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
+    .then((user) => res.status(OK_CODE).send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+    }))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+      }
+      if (err.code === 11000) {
+        return next(new ConflictError(`При регистрации указан ${email}, который уже существует на сервере`));
+      }
+      return next(err);
+    });
 };
 
 // обновление данных пользователя
