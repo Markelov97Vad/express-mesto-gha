@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { default: mongoose } = require('mongoose');
 
 const User = require('../models/user');
 const {
@@ -39,7 +40,7 @@ const getUserById = (req, res, next) => {
       return res.status(OK_CODE).send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err instanceof mongoose.Error.CastError) {
         return next(new BadRequestError(`Передан некорретный Id: ${userId} пользователя`));
       }
       return next(err);
@@ -76,19 +77,13 @@ const createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    // .then((user) => res.status(CREATED_CODE).send({
-    //   name: user.name,
-    //   about: user.about,
-    //   avatar: user.avatar,
-    //   email: user.email,
-    // }))
     .then((user) => {
       const newUser = user.toObject();
       delete newUser.password;
       res.status(CREATED_CODE).send(newUser);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err instanceof mongoose.Error.ValidationError) {
         return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
       }
       if (err.code === 11000) {
@@ -118,7 +113,7 @@ const setUserInfo = (req, res, next) => {
       return res.status(OK_CODE).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err instanceof mongoose.Error.ValidationError) {
         return next(new BadRequestError('Переданы некорректные данные при обновлении профиля.'));
       }
       return next(err);
@@ -145,7 +140,7 @@ const setAvatar = (req, res, next) => {
       return res.status(OK_CODE).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err instanceof mongoose.Error.ValidationError) {
         return next(new BadRequestError('Переданы некорректные данные при обновлении аватара'));
       }
       return next(err);
