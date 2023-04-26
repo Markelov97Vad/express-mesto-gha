@@ -12,7 +12,6 @@ const { getUserByIdValidation, setUserInfoValidation, setAvatarValidation } = re
 // возвращает всех пользователей
 usersRouter.get('/', getUsers);
 // свозвращает информацию о текущем пользователе
-// usersRouter.post('/', createUser);
 usersRouter.get('/me', getCurrentUser);
 // возвращает пользователя по _id
 usersRouter.get('/:userId', getUserByIdValidation, getUserById);
