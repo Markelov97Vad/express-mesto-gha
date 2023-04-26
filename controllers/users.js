@@ -10,6 +10,7 @@ const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
 
+// авторизация
 const login = (req, res, next) => {
   const { email, password } = req.body;
   User.findUserByCredentails(email, password)

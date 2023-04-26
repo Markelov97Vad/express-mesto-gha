@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(router);
-
+// обработка ошибок celebrate
 app.use(errors());
 // централизированная обработка ошибок
 app.use(errorHendler);
