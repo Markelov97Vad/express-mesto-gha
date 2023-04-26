@@ -13,8 +13,7 @@ cardsRouter.get('/', getCards);
 // создает карточку
 cardsRouter.post('/', createCardValidation, createCard);
 // удаляет карточку
-// cardsRouter.delete('/:cardId', cardIdValidation, deleteCard);
-cardsRouter.delete('/:cardId', deleteCard);
+cardsRouter.delete('/:cardId', cardIdValidation, deleteCard);
 // ставит лайк карточке
 cardsRouter.put('/:cardId/likes', cardIdValidation, likeCard);
 // убирает лайк с карточки
