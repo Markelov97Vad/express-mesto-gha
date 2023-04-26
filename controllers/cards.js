@@ -4,7 +4,7 @@ const BadRequestError = require('../errors/BadRequestError');
 const Card = require('../models/card');
 
 const {
-  OK_CODE,
+  OK_CODE, CREATED_CODE,
 } = require('../utils/codeStatus');
 
 // запрос всех карточек
@@ -23,7 +23,7 @@ const createCard = (req, res, next) => {
   const owner = req.user._id;
 
   Card.create({ name, link, owner })
-    .then((card) => res.status(OK_CODE).send(card))
+    .then((card) => res.status(CREATED_CODE).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные при создании карточки.'));
@@ -44,10 +44,9 @@ const deleteCard = (req, res, next) => {
       if (card.owner.valueOf() !== _id) {
         throw new ForbiddenError('Попытка удалить чужую карточку');
       }
-      Card.findByIdAndDelete(cardId)
-        .then(() => res.status(OK_CODE).send({ message: `Карточка с id: ${cardId} была удалена` }))
-        .catch(next);
+      return card.deleteOne();
     })
+    .then(() => res.status(OK_CODE).send({ message: `Карточка с id: ${cardId} была удалена` }))
     .catch((err) => {
       if (err.name === 'CastError') {
         return next(new BadRequestError(`Указан некорректный id: ${cardId}`));

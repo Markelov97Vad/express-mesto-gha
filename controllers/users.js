@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 const {
-  OK_CODE,
+  OK_CODE, CREATED_CODE,
 } = require('../utils/codeStatus');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
@@ -76,12 +76,17 @@ const createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    .then((user) => res.status(OK_CODE).send({
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-      email: user.email,
-    }))
+    // .then((user) => res.status(CREATED_CODE).send({
+    //   name: user.name,
+    //   about: user.about,
+    //   avatar: user.avatar,
+    //   email: user.email,
+    // }))
+    .then((user) => {
+      const newUser = user.toObject();
+      delete newUser.password;
+      res.status(CREATED_CODE).send(newUser);
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
