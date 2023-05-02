@@ -16,7 +16,9 @@ router.use(auth);
 
 // роуты требующие авторизацию
 router.use('/users', usersRouter);
+// router.use('/users', auth, usersRouter);
 router.use('/cards', cardsRouter);
+// router.use('/cards', auth, cardsRouter);
 router.use('*', (req, res, next) => {
   next(new NotFoundError('Ресурс не найден. Проверьте URL и метод запроса'));
 });
