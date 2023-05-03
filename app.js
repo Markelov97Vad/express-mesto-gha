@@ -28,5 +28,5 @@ app.use(errors());
 app.use(errorHendler);
 
 app.listen(PORT, () => {
-  console.log(`Сервер запущен ${PORT}`);
+  console.log(`Сервер запущен, порт ${PORT}`);
 });
