@@ -26,7 +26,8 @@ app.use(errorLogger);
 app.use(errors());
 // централизированная обработка ошибок
 app.use(errorHendler);
-
+/* eslint-disable no-alert, no-console */
 app.listen(PORT, () => {
   console.log(`Сервер запущен, порт ${PORT}`);
 });
+/* eslint-enable no-alert, no-console */
